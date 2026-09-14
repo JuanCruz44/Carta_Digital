@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno reales (nunca commitear claves)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Supabase CLI (estado local / temporales)
+backend/supabase/.branches/
+backend/supabase/.temp/
+backend/supabase/.env
+
+# Angular / build
+frontend/dist/
+frontend/.angular/
+frontend/tmp/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documentos fuente del proyecto (planificación, no código)
+*.odt

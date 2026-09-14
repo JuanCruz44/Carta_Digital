@@ -1,0 +1,6 @@
+-- =============================================================================
+-- Seed de datos de prueba (Fase B6)
+-- Se completará al llegar a la Fase B6: "Bar Lindo" con 5 mesas, 4 categorías,
+-- 11 productos, tags NFC asociados y usuarios de prueba por rol.
+-- Este archivo se aplica con `supabase db reset` (local) o manualmente.
+-- =============================================================================
