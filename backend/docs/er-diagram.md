@@ -1,7 +1,7 @@
-# Diagrama ER — borrador (Fase B0)
+# Diagrama ER — final (Fase B7)
 
-> Borrador inicial del modelo de datos. Se actualizará en Fase B7 para reflejar
-> lo realmente implementado (RLS y funciones incluidas).
+> Modelo de datos tal como quedó implementado, incluidas la seguridad (RLS) y las
+> funciones. Coherente con `schema.sql` y las migraciones de `supabase/migrations/`.
 
 ```mermaid
 erDiagram
@@ -27,7 +27,8 @@ erDiagram
         text name
         text slug UK
         bool is_active
-        bool orders_enabled "toggle pedidos ON/OFF (B8/F8)"
+        bool orders_enabled "toggle pedidos ON/OFF (F8)"
+        int session_ttl_minutes "duración de sesión (default 120)"
         timestamptz created_at
         timestamptz updated_at
     }
@@ -133,3 +134,32 @@ erDiagram
   `expires_at` se controla la expiración (Fase B4).
 - **Snapshots en `order_items`** (`product_name`, `unit_price`): si el admin
   cambia el precio o el nombre después, el pedido histórico no se altera.
+
+## Capa de seguridad (RLS) — Fase B2
+
+Todas las tablas tienen Row Level Security activo. Resumen de acceso:
+
+- **Cliente (anon)**: lee solo restaurantes activos, y categorías/productos
+  disponibles. No accede a pedidos, sesiones, mesas ni usuarios.
+- **admin / kitchen**: acceden solo a los datos de su restaurante (aislamiento
+  por `restaurant_users`). El admin edita el catálogo, mesas y tags.
+- **superadmin** (`users.is_superadmin`): acceso global.
+- Funciones ayudantes (SECURITY DEFINER): `is_superadmin()`,
+  `is_restaurant_admin(uuid)`, `is_restaurant_staff(uuid)`.
+- Trigger `handle_new_user`: crea el perfil en `users` al registrarse en Auth.
+
+## Funciones RPC — Fases B3/B4
+
+Escrituras sensibles pasan por funciones SECURITY DEFINER (el cliente no escribe
+tablas directamente). Detalle de entradas/salidas en `api-rpc.md`.
+
+- `resolve_nfc_tag(tag_uid)` → abre sesión al escanear (cliente).
+- `create_order(session_token, items)` → crea el pedido; el total lo calcula el
+  servidor (cliente).
+- `set_order_status(order_id, status)` → cambia el estado (solo staff).
+- `reassign_nfc_tag(tag_id, table_id)` → mueve un tag de mesa (solo admin).
+
+## Realtime — Fase B5
+
+`orders` y `order_items` transmiten cambios (INSERT/UPDATE) en tiempo real,
+segmentados por restaurante mediante las mismas políticas RLS.
