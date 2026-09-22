@@ -1,0 +1,13 @@
+{
+  "name": "carta-digital-backend",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Backend (Supabase) de Carta Digital: migraciones, seed y pruebas end-to-end.",
+  "scripts": {
+    "test:e2e": "node --env-file=.env tests/e2e.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.0"
+  }
+}
